@@ -10,6 +10,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -25,6 +27,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.ProgressMonitor;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.HyperlinkEvent;
@@ -288,6 +291,54 @@ public class MainWindow
 		if (!response.succeeded())
 			throw new IllegalArgumentException("Game update requires successful login response.");
 		
+		final ProgressMonitor progMon = new ProgressMonitor(frmTerrafirmacraftLauncher, "Downloading game...", "Please wait...", 0, 100);
+		final GameUpdater updater = new GameUpdater("tfcraft", false)
+		{
+			@Override
+			protected void done()
+			{
+				progMon.close();
+				
+				// Catch exceptions
+				try
+				{
+					get();
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+					return;
+				} catch (ExecutionException e)
+				{
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, 
+							"Failed to install TerraFirmaCraft. An unknown error occurred:\n" + e.getMessage(), 
+							"Install Failed", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}
+		};
 		
+		updater.addPropertyChangeListener(new PropertyChangeListener()
+		{
+			@Override
+			public void propertyChange(PropertyChangeEvent evt)
+			{
+				if (progMon.isCanceled())
+					updater.cancel(false);
+				
+				if (!updater.isDone())
+				{
+					int prog = updater.getProgress();
+					if (prog < 0)
+						prog = 0;
+					if (prog > 100)
+						prog = 100;
+					progMon.setProgress(prog);
+					progMon.setNote(updater.getStatus());
+				}
+			}
+		});
+		
+		updater.execute();
 	}
 }

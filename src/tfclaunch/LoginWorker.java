@@ -26,8 +26,10 @@ public class LoginWorker extends SwingWorker<LoginResponse, Void>
 		
 		URL loginURL = new URL(requestBuilder.toString());
 		InputStream stream = loginURL.openStream();
-		Scanner scanner = new Scanner(stream).useDelimiter("\\A");
+		Scanner scanner = new Scanner(stream);
+		scanner.useDelimiter("\\A");
 		String responseStr = scanner.hasNext() ? scanner.next() : "";
+		scanner.close();
 		
 		if (!responseStr.contains(":"))
 		{
