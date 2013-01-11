@@ -8,13 +8,18 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -217,6 +222,13 @@ public class MainWindow
 		loginPanel.add(btnOptions, gbc_btnOptions);
 		
 		btnLogin = new JButton("Login");
+		btnLogin.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				onLoginClicked();
+			}
+		});
 		GridBagConstraints gbc_btnLogin = new GridBagConstraints();
 		gbc_btnLogin.insets = new Insets(3, 5, 3, 0);
 		gbc_btnLogin.fill = GridBagConstraints.HORIZONTAL;
@@ -235,5 +247,47 @@ public class MainWindow
 			e.printStackTrace();
 			newsPane.setText("<html><head></head><body><p style=\"color:red; text-align:center;\">Failed to load news.</p></body></html>");
 		}
+	}
+	
+	private void onLoginClicked()
+	{
+		LoginWorker login = new LoginWorker(new UserInfo(usernameField.getText(), new String(passwordField.getPassword())))
+		{
+			@Override
+			protected void done()
+			{
+				LoginResponse response = null;
+				try
+				{
+					response = get();
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				} catch (ExecutionException e)
+				{
+					e.printStackTrace();
+					if (e.getCause() instanceof IOException || e.getCause() instanceof MalformedURLException)
+						JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e.getMessage(), 
+								"Login Failed", JOptionPane.ERROR_MESSAGE);
+				}
+				
+				if (response == null)
+					return;
+				else if (response.succeeded())
+					doGameUpdate(response);
+				else
+					JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, response.getErrorMsg(), 
+							"Login Failed", JOptionPane.ERROR_MESSAGE);
+			}
+		};
+		login.execute();
+	}
+	
+	private void doGameUpdate(final LoginResponse response)
+	{
+		if (!response.succeeded())
+			throw new IllegalArgumentException("Game update requires successful login response.");
+		
+		
 	}
 }
