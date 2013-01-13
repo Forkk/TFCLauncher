@@ -358,14 +358,18 @@ public class MainWindow
 	{
 		// Start the game.
 		GameLauncher launcher = new GameLauncher(installDir, sessionInfo);
+		boolean launched = true;
 		try
 		{
 			launcher.launch();
 		} catch (GeneralException e)
 		{
 			e.printStackTrace();
+			launched = false;
 			JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e.getMessage(),
 					"Launch Failed", JOptionPane.ERROR_MESSAGE);
 		}
+		if (launched)
+			frmTerrafirmacraftLauncher.setVisible(false);
 	}
 }
