@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
@@ -34,6 +33,8 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
+
+import tfclaunch.utils.GeneralException;
 
 public class MainWindow
 {
@@ -269,7 +270,7 @@ public class MainWindow
 				} catch (ExecutionException e)
 				{
 					e.printStackTrace();
-					if (e.getCause() instanceof IOException || e.getCause() instanceof MalformedURLException)
+					if (e.getCause() instanceof GeneralException)
 						JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e.getMessage(), 
 								"Login Failed", JOptionPane.ERROR_MESSAGE);
 				}
@@ -286,9 +287,9 @@ public class MainWindow
 		login.execute();
 	}
 	
-	private void doGameUpdate(final LoginResponse response)
+	private void doGameUpdate(final LoginResponse sessionInfo)
 	{
-		if (!response.succeeded())
+		if (!sessionInfo.succeeded())
 			throw new IllegalArgumentException("Game update requires successful login response.");
 		
 		final ProgressMonitor progMon = new ProgressMonitor(frmTerrafirmacraftLauncher, "Downloading game...", "Please wait...", 0, 100);
@@ -310,11 +311,22 @@ public class MainWindow
 				} catch (ExecutionException e)
 				{
 					e.printStackTrace();
-					JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, 
-							"Failed to install TerraFirmaCraft. An unknown error occurred:\n" + e.getMessage(), 
-							"Install Failed", JOptionPane.ERROR_MESSAGE);
+					
+					if (e.getCause() instanceof GeneralException)
+					{
+						JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e.getCause().getMessage(),
+								"Install Failed", JOptionPane.ERROR_MESSAGE);
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, 
+								"Failed to install TerraFirmaCraft. An unknown error occurred:\n" + e.getMessage(), 
+								"Install Failed", JOptionPane.ERROR_MESSAGE);
+					}
 					return;
 				}
+				
+				launchGame(installDir, sessionInfo);
 			}
 		};
 		
@@ -340,5 +352,20 @@ public class MainWindow
 		});
 		
 		updater.execute();
+	}
+	
+	private void launchGame(String installDir, LoginResponse sessionInfo)
+	{
+		// Start the game.
+		GameLauncher launcher = new GameLauncher(installDir, sessionInfo);
+		try
+		{
+			launcher.launch();
+		} catch (GeneralException e)
+		{
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e.getMessage(),
+					"Launch Failed", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }

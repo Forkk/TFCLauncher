@@ -2,10 +2,12 @@ package tfclaunch;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,6 +17,8 @@ import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import javax.swing.SwingWorker;
 
@@ -22,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import tfclaunch.utils.GeneralException;
 import tfclaunch.utils.OSUtils;
 import tfclaunch.utils.PathUtils;
 
@@ -43,7 +48,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		this.coreModURLs = new ArrayList<URL>();
 	}
 	
-	private static void readInputStream(InputStream in, OutputStream out)
+	private static void readInputStream(InputStream in, OutputStream out, boolean closeAfter)
 			throws IOException
 	{
 		try
@@ -54,12 +59,20 @@ public class GameUpdater extends SwingWorker<Void, Void>
 				out.write(buf, 0, lastRead);
 		} finally
 		{
-			in.close();
-			out.close();
+			if (closeAfter)
+			{
+				in.close();
+				out.close();
+			}
 		}
 	}
 	
-	private static String urlFilename(URL url)
+	private static void readInputStream(InputStream in, OutputStream out) throws IOException
+	{
+		readInputStream(in, out, true);
+	}
+	
+	private static String urlFilename(URL url) throws GeneralException
 	{
 		String path = url.getFile();
 		try
@@ -68,7 +81,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		} catch (UnsupportedEncodingException e)
 		{
 			e.printStackTrace();
-			throw new RuntimeException("Failed to decode URL.");
+			throw new GeneralException("Failed to decode URL.", e);
 		}
 	}
 	
@@ -99,6 +112,8 @@ public class GameUpdater extends SwingWorker<Void, Void>
 			downloadFiles();
 			setProgress(75);
 			downloadLWJGL();
+			setProgress(95);
+			removeMetaInf();
 			setProgress(100);
 		}
 		
@@ -117,7 +132,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		return status;
 	}
 	
-	private void getFileLists() throws JSONException, IOException
+	private void getFileLists() throws JSONException, IOException, GeneralException
 	{
 		setStatus("Checking for updates...");
 		
@@ -127,7 +142,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 			jsonURL = new URL(updateCheckURL);
 		} catch (MalformedURLException e)
 		{
-			throw new RuntimeException("Malformed update check URL");
+			throw new GeneralException("Malformed update check URL", e);
 		}
 		
 		InputStream stream = jsonURL.openStream();
@@ -170,18 +185,18 @@ public class GameUpdater extends SwingWorker<Void, Void>
 			}
 		} catch (MalformedURLException e)
 		{
-			throw new RuntimeException("One of the file list URLs is malformed.");
+			throw new GeneralException("One of the file list URLs is malformed.", e);
 		}
 	}
 	
-	private void downloadFiles() throws IOException
+	private void downloadFiles() throws IOException, GeneralException
 	{
 		setStatus("Downloading game...");
 		
 		// Download minecraft.jar
 		{
 			setStatus("Downloading game: minecraft.jar");
-			File mcJar = new File(binDir, "minecraft.jar");
+			File mcJar = new File(binDir, "minecraft.jar.tmp");
 			FileOutputStream out = new FileOutputStream(mcJar);
 			InputStream in = mcJarURL.openStream();
 			readInputStream(in, out);
@@ -189,18 +204,35 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		
 		String statusPrefix = "Downloading " + versionName + ":";
 		
-		// Download jar mods. These will be loaded through a classloader on launch
-		downloadFileList(jarModURLs, new File(binDir, "jarmods"), statusPrefix);
+		// Download jar mods. These will be loaded through a classloader on launch.
+		downloadFileList(jarModURLs, new File(binDir, "jarmods"),
+				new File(binDir, "loadorder.txt"), statusPrefix);
 		
 		// Download other mods.
-		downloadFileList(mlModURLs, new File(installDir, "mods"), statusPrefix);
-		downloadFileList(coreModURLs, new File(installDir, "coremods"), statusPrefix);
+		downloadFileList(mlModURLs, new File(installDir, "mods"), null, statusPrefix);
+		downloadFileList(coreModURLs, new File(installDir, "coremods"), null, statusPrefix);
 	}
 	
-	private void downloadFileList(ArrayList<URL> urls, File dest, String statusPrefix) throws IOException
+	/**
+	 * Downloads the given list of URLs into the given folder.
+	 * @param urls list of URLs to download
+	 * @param dest destination folder to download to
+	 * @param fileListPath if not null, saves a list of the files in the order they were
+	 * downloaded to this file
+	 * @param statusPrefix prefix to use for setStatus
+	 * @throws IOException if an IOException is thrown
+	 * @throws GeneralException If a problem occurs. Should be handled by displaying an error message to the user.
+	 */
+	private void downloadFileList(ArrayList<URL> urls, File dest, File fileListPath, String statusPrefix) 
+			throws IOException, GeneralException
 	{
 		if (!dest.exists())
 			dest.mkdirs();
+		
+		PrintWriter writer = null;
+		
+		if (fileListPath != null)
+			writer = new PrintWriter(fileListPath);
 		
 		for (int i = 0; i < urls.size(); i++)
 		{
@@ -209,10 +241,18 @@ public class GameUpdater extends SwingWorker<Void, Void>
 			FileOutputStream out = new FileOutputStream(destFile);
 			InputStream in = urls.get(i).openStream();
 			readInputStream(in, out);
+			
+			if (writer != null)
+			{
+				writer.println(urlFilename(urls.get(i)));
+			}
 		}
+		
+		if (writer != null)
+			writer.close();
 	}
 	
-	private void downloadLWJGL() throws IOException
+	private void downloadLWJGL() throws IOException, GeneralException
 	{
 		setStatus("Downloading LWJGL...");
 		
@@ -238,7 +278,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 			break;
 		
 		default:
-			throw new RuntimeException("OS not recognized.");
+			throw new GeneralException("OS not recognized.");
 		}
 		
 		for (int i = 0; i < downloadURLs.length; i++)
@@ -281,7 +321,48 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		nativesJar.close();
 	}
 	
-	private String installDir;
+	private void removeMetaInf() throws GeneralException
+	{
+		setStatus("Removing META-INF...");
+		
+		File inFile = new File(binDir, "minecraft.jar.tmp");
+		File outFile = new File(binDir, "minecraft.jar");
+		
+		try
+		{
+			ZipInputStream in = new ZipInputStream(new FileInputStream(inFile));
+			ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outFile));
+			
+			ZipEntry entry;
+			
+			while ((entry = in.getNextEntry()) != null)
+			{
+				if (entry.getName().toLowerCase().contains("meta-inf"))
+					continue;
+				
+				out.putNextEntry(entry);
+				readInputStream(in, out, false);
+				out.closeEntry();
+			}
+			
+			in.close();
+			out.close();
+		} catch (FileNotFoundException e)
+		{
+			// This doesn't seem physically possible! We just downloaded that file!
+			e.printStackTrace();
+			throw new GeneralException("Can't find minecraft.jar.tmp!", e);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+			throw new GeneralException("Failed to read minecraft.jar.tmp!", e);
+		} finally
+		{
+			
+		}
+	}
+	
+	protected String installDir;
 	private boolean forceUpdate;
 	
 	private String status;
