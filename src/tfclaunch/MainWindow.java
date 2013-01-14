@@ -49,6 +49,7 @@ public class MainWindow
 	private JButton btnOptions;
 	private JScrollPane newsScrollPane;
 	private JTextPane newsPane;
+	private JLabel lblLoginStatus;
 	
 	/**
 	 * Launch the application.
@@ -169,63 +170,79 @@ public class MainWindow
 				gbc_loginPanel);
 		GridBagLayout gbl_loginPanel = new GridBagLayout();
 		gbl_loginPanel.columnWidths = new int[] { 0, 0, 0, 0 };
-		gbl_loginPanel.rowHeights = new int[] { 0, 0, 0 };
+		gbl_loginPanel.rowHeights = new int[] { 0, 0, 0, 0 };
 		gbl_loginPanel.columnWeights = new double[] { 0.0, 1.0, 0.0,
 				Double.MIN_VALUE };
-		gbl_loginPanel.rowWeights = new double[] { 0.0, 0.0, 0.0 };
+		gbl_loginPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0 };
 		loginPanel.setLayout(gbl_loginPanel);
 		
+		lblLoginStatus = new JLabel("Status");
+		lblLoginStatus.setVisible(false);
+		GridBagConstraints gbc_lblLoginStatus = new GridBagConstraints();
+		gbc_lblLoginStatus.gridwidth = 3;
+		gbc_lblLoginStatus.insets = new Insets(0, 0, 2, 0);
+		gbc_lblLoginStatus.gridx = 0;
+		gbc_lblLoginStatus.gridy = 0;
+		loginPanel.add(lblLoginStatus, gbc_lblLoginStatus);
+		
 		lblUsername = new JLabel("Username:");
+		lblUsername.setDisplayedMnemonic('U');
 		GridBagConstraints gbc_lblUsername = new GridBagConstraints();
 		gbc_lblUsername.anchor = GridBagConstraints.EAST;
-		gbc_lblUsername.insets = new Insets(0, 0, 0, 5);
+		gbc_lblUsername.insets = new Insets(3, 0, 3, 5);
 		gbc_lblUsername.gridx = 0;
-		gbc_lblUsername.gridy = 0;
+		gbc_lblUsername.gridy = 1;
 		loginPanel.add(lblUsername, gbc_lblUsername);
 		
 		usernameField = new JTextField();
-		usernameField.setPreferredSize(new Dimension(140, 20));
+		lblUsername.setLabelFor(usernameField);
+		usernameField.setPreferredSize(new Dimension(140, 23));
 		GridBagConstraints gbc_usernameField = new GridBagConstraints();
-		gbc_usernameField.insets = new Insets(2, 0, 2, 0);
+		gbc_usernameField.insets = new Insets(3, 0, 3, 5);
 		gbc_usernameField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_usernameField.gridx = 1;
-		gbc_usernameField.gridy = 0;
+		gbc_usernameField.gridy = 1;
 		loginPanel.add(usernameField, gbc_usernameField);
 		usernameField.setColumns(10);
 		
 		lblPassword = new JLabel("Password:");
+		lblPassword.setDisplayedMnemonic('P');
 		GridBagConstraints gbc_lblPassword = new GridBagConstraints();
 		gbc_lblPassword.anchor = GridBagConstraints.EAST;
-		gbc_lblPassword.insets = new Insets(0, 0, 0, 5);
+		gbc_lblPassword.insets = new Insets(3, 0, 3, 5);
 		gbc_lblPassword.gridx = 0;
-		gbc_lblPassword.gridy = 1;
+		gbc_lblPassword.gridy = 2;
 		loginPanel.add(lblPassword, gbc_lblPassword);
 		
 		passwordField = new JPasswordField();
-		passwordField.setPreferredSize(new Dimension(140, 20));
+		lblPassword.setLabelFor(passwordField);
+		passwordField.setPreferredSize(new Dimension(140, 23));
 		GridBagConstraints gbc_passwordField = new GridBagConstraints();
-		gbc_passwordField.insets = new Insets(2, 0, 2, 0);
+		gbc_passwordField.insets = new Insets(3, 0, 3, 5);
 		gbc_passwordField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_passwordField.gridx = 1;
-		gbc_passwordField.gridy = 1;
+		gbc_passwordField.gridy = 2;
 		loginPanel.add(passwordField, gbc_passwordField);
 		
 		chckbxRememberPassword = new JCheckBox("Remember password?");
+		chckbxRememberPassword.setMnemonic('R');
 		GridBagConstraints gbc_chckbxRememberPassword = new GridBagConstraints();
 		gbc_chckbxRememberPassword.insets = new Insets(0, 0, 0, 6);
 		gbc_chckbxRememberPassword.gridx = 1;
-		gbc_chckbxRememberPassword.gridy = 2;
+		gbc_chckbxRememberPassword.gridy = 3;
 		loginPanel.add(chckbxRememberPassword, gbc_chckbxRememberPassword);
 		
 		btnOptions = new JButton("Options");
+		btnOptions.setMnemonic('O');
 		GridBagConstraints gbc_btnOptions = new GridBagConstraints();
 		gbc_btnOptions.insets = new Insets(3, 5, 3, 0);
 		gbc_btnOptions.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnOptions.gridx = 2;
-		gbc_btnOptions.gridy = 0;
+		gbc_btnOptions.gridy = 1;
 		loginPanel.add(btnOptions, gbc_btnOptions);
 		
 		btnLogin = new JButton("Login");
+		btnLogin.setMnemonic('L');
 		btnLogin.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -237,7 +254,7 @@ public class MainWindow
 		gbc_btnLogin.insets = new Insets(3, 5, 3, 0);
 		gbc_btnLogin.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnLogin.gridx = 2;
-		gbc_btnLogin.gridy = 1;
+		gbc_btnLogin.gridy = 2;
 		loginPanel.add(btnLogin, gbc_btnLogin);
 		loginPanel.setFocusTraversalPolicy(new FocusTraversalOnArray(
 				new Component[] { usernameField, passwordField,
@@ -253,6 +270,60 @@ public class MainWindow
 		}
 	}
 	
+	/**
+	 * Sets the status label above the login box to the given color with the given text.
+	 * If <code>status</code> is empty, the label is hidden, otherwise, it is shown.
+	 * @param status The status message to display.
+	 * @param color The color of the label.
+	 */
+	private void setStatusLabel(String status, Color color)
+	{
+		lblLoginStatus.setVisible(!status.isEmpty());
+		lblLoginStatus.setText(status);
+		lblLoginStatus.setForeground(color);
+	}
+	
+	/**
+	 * Sets the status label above the login box with the given status message shown in black.
+	 * If <code>status</code> is empty, the label is hidden, otherwise, it is shown.
+	 * @param status The status message to display.
+	 */
+	private void setStatusMessage(String status)
+	{
+		setStatusLabel(status, Color.BLACK);
+	}
+	
+	/**
+	 * Sets the status label above the login box with the given error message shown in red.
+	 * If <code>status</code> is empty, the label is hidden, otherwise, it is shown.
+	 * @param status The error message to display.
+	 */
+	private void setStatusError(String status)
+	{
+		setStatusLabel(status, Color.RED);
+	}
+	
+	/**
+	 * Hides the status label blank, hiding it.
+	 */
+	private void setNoStatus()
+	{
+		lblLoginStatus.setText("");
+		lblLoginStatus.setVisible(false);
+	}
+	
+	/**
+	 * Enables or disables the buttons and text-boxes in the login panel.
+	 * @param enable Whether or not to enable the controls.
+	 */
+	private void enableLoginPanel(boolean enable)
+	{
+		Component[] components = loginPanel.getComponents();
+		for (int i = 0; i < components.length; i++)
+			if (components[i] != lblLoginStatus)
+				components[i].setEnabled(enable);
+	}
+	
 	private void onLoginClicked()
 	{
 		LoginWorker login = new LoginWorker(new UserInfo(usernameField.getText(), new String(passwordField.getPassword())))
@@ -260,6 +331,9 @@ public class MainWindow
 			@Override
 			protected void done()
 			{
+				setNoStatus();
+				enableLoginPanel(true);
+				
 				LoginResponse response = null;
 				try
 				{
@@ -271,19 +345,33 @@ public class MainWindow
 				{
 					e.printStackTrace();
 					if (e.getCause() instanceof GeneralException)
+					{
 						JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e.getMessage(), 
 								"Login Failed", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 				
 				if (response == null)
+				{
+					setStatusError("Login failed: An unexpected error occurred.");
 					return;
+				}
 				else if (response.succeeded())
+				{
 					doGameUpdate(response);
+				}
 				else
-					JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, response.getErrorMsg(), 
-							"Login Failed", JOptionPane.ERROR_MESSAGE);
+				{
+//					JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, response.getErrorMsg(), 
+//							"Login Failed", JOptionPane.ERROR_MESSAGE);
+					setStatusError("Login failed: " + response.getErrorMsg());
+				}
 			}
 		};
+		
+		// Show the status label with the text "logging in."
+		setStatusMessage("Logging in...");
+		enableLoginPanel(false);
 		login.execute();
 	}
 	
