@@ -39,7 +39,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 {
 	public static final String updateCheckURL = "http://localhost/tfcfiles.json";
 	
-	public GameUpdater(String installDir, boolean forceUpdate)
+	public GameUpdater(File installDir, boolean forceUpdate)
 	{
 		this.installDir = installDir;
 		this.forceUpdate = forceUpdate;
@@ -88,7 +88,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 	@Override
 	protected Void doInBackground() throws Exception
 	{
-		binDir = new File(PathUtils.combine(installDir, "bin"));
+		binDir = new File(installDir, "bin");
 		if (!binDir.exists())
 			binDir.mkdirs();
 		
@@ -334,7 +334,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 			nativesDir.mkdirs();
 		
 		Enumeration<? extends ZipEntry> entries;
-		ZipFile nativesJar = new ZipFile(PathUtils.combine(installDir, "bin",
+		ZipFile nativesJar = new ZipFile(PathUtils.combine(installDir.getPath(), "bin",
 				urlFilename(downloadURLs[3])));
 		
 		entries = nativesJar.entries();
@@ -397,7 +397,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		}
 	}
 	
-	protected String installDir;
+	protected File installDir;
 	private boolean forceUpdate;
 	
 	private String status;

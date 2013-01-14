@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
@@ -50,6 +51,8 @@ public class MainWindow
 	private JScrollPane newsScrollPane;
 	private JTextPane newsPane;
 	private JLabel lblLoginStatus;
+	
+	private AppSettings settings;
 	
 	/**
 	 * Launch the application.
@@ -233,6 +236,13 @@ public class MainWindow
 		loginPanel.add(chckbxRememberPassword, gbc_chckbxRememberPassword);
 		
 		btnOptions = new JButton("Options");
+		btnOptions.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				onOptionsClicked();
+			}
+		});
 		btnOptions.setMnemonic('O');
 		GridBagConstraints gbc_btnOptions = new GridBagConstraints();
 		gbc_btnOptions.insets = new Insets(3, 5, 3, 0);
@@ -267,6 +277,16 @@ public class MainWindow
 		{
 			e.printStackTrace();
 			newsPane.setText("<html><head></head><body><p style=\"color:red; text-align:center;\">Failed to load news.</p></body></html>");
+		}
+		
+		settings = new AppSettings(new File("tfclauncher.cfg"));
+		try
+		{
+			settings.loadSettings();
+		} catch (GeneralException e1)
+		{
+			JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e1.getMessage(), 
+					"Failed to load settings.", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -332,7 +352,6 @@ public class MainWindow
 			protected void done()
 			{
 				setNoStatus();
-				enableLoginPanel(true);
 				
 				LoginResponse response = null;
 				try
@@ -348,12 +367,14 @@ public class MainWindow
 					{
 						JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e.getMessage(), 
 								"Login Failed", JOptionPane.ERROR_MESSAGE);
+						enableLoginPanel(true);
 					}
 				}
 				
 				if (response == null)
 				{
 					setStatusError("Login failed: An unexpected error occurred.");
+					enableLoginPanel(true);
 					return;
 				}
 				else if (response.succeeded())
@@ -365,6 +386,7 @@ public class MainWindow
 //					JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, response.getErrorMsg(), 
 //							"Login Failed", JOptionPane.ERROR_MESSAGE);
 					setStatusError("Login failed: " + response.getErrorMsg());
+					enableLoginPanel(true);
 				}
 			}
 		};
@@ -381,7 +403,7 @@ public class MainWindow
 			throw new IllegalArgumentException("Game update requires successful login response.");
 		
 		final ProgressMonitor progMon = new ProgressMonitor(frmTerrafirmacraftLauncher, "Downloading game...", "Please wait...", 0, 100);
-		final GameUpdater updater = new GameUpdater("tfcraft", false)
+		final GameUpdater updater = new GameUpdater(settings.getInstallPath(), settings.getForceUpdate())
 		{
 			@Override
 			protected void done()
@@ -414,7 +436,7 @@ public class MainWindow
 					return;
 				}
 				
-				launchGame(installDir, sessionInfo);
+				launchGame(installDir.getPath(), sessionInfo);
 			}
 		};
 		
@@ -459,5 +481,12 @@ public class MainWindow
 		}
 		if (launched)
 			frmTerrafirmacraftLauncher.setVisible(false);
+	}
+	
+	private void onOptionsClicked()
+	{
+		OptionsDialog opsDlg = new OptionsDialog(frmTerrafirmacraftLauncher, settings);
+		opsDlg.setLocationRelativeTo(frmTerrafirmacraftLauncher);
+		opsDlg.setVisible(true);
 	}
 }

@@ -2,6 +2,7 @@ bin/
 tfcraft/
 
 *.class
+*.cfg
 
 # Package Files #
 *.jar
