@@ -109,6 +109,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		// If the installed version isn't the latest version.
 		if (forceUpdate || !versionID.equalsIgnoreCase(installedVersion))
 		{
+			deleteOldFiles();
 			downloadFiles();
 			setProgress(75);
 			downloadLWJGL();
@@ -197,6 +198,29 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		} catch (MalformedURLException e)
 		{
 			throw new GeneralException("One of the file list URLs is malformed.", e);
+		}
+	}
+	
+	private void deleteOldFiles() throws IOException, GeneralException
+	{
+		deleteRecursive(new File(binDir, "jarmods"));
+		deleteRecursive(new File(installDir, "mods"));
+		deleteRecursive(new File(installDir, "coremods"));
+	}
+	
+	private void deleteRecursive(File file) throws IOException
+	{
+		if (file.isDirectory())
+		{
+			File[] files = file.listFiles();
+			for (int i = 0; i < files.length; i++)
+			{
+				deleteRecursive(files[i]);
+			}
+		}
+		else
+		{
+			file.delete();
 		}
 	}
 	
