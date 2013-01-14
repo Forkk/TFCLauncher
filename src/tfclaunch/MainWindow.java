@@ -286,6 +286,13 @@ public class MainWindow
 			JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e1.getMessage(), 
 					"Failed to load settings.", JOptionPane.ERROR_MESSAGE);
 		}
+		
+		UserInfo uinfo = new UserInfo("", "");
+		
+		uinfo.readFile(new File("lastlogin"));
+		
+		usernameField.setText(uinfo.getUsername());
+		passwordField.setText(uinfo.getPassword());
 	}
 	
 	/**
@@ -344,7 +351,16 @@ public class MainWindow
 	
 	private void onLoginClicked()
 	{
-		LoginWorker login = new LoginWorker(new UserInfo(usernameField.getText(), new String(passwordField.getPassword())))
+		UserInfo uinfo = new UserInfo(usernameField.getText(), new String(passwordField.getPassword()));
+		try
+		{
+			uinfo.writeFile(new File("lastlogin"), chckbxRememberPassword.isSelected());
+		} catch (IOException e1)
+		{
+			e1.printStackTrace();
+		}
+		
+		LoginWorker login = new LoginWorker(uinfo)
 		{
 			@Override
 			protected void done()
