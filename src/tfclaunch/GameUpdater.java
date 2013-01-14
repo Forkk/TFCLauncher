@@ -107,7 +107,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		setProgress(10);
 		
 		// If the installed version isn't the latest version.
-		if (forceUpdate || versionID != installedVersion)
+		if (forceUpdate || !versionID.equalsIgnoreCase(installedVersion))
 		{
 			downloadFiles();
 			setProgress(75);
@@ -115,6 +115,17 @@ public class GameUpdater extends SwingWorker<Void, Void>
 			setProgress(95);
 			removeMetaInf();
 			setProgress(100);
+		}
+		
+		// Write version file.
+		try
+		{
+			PrintWriter writer = new PrintWriter(versionFile);
+			writer.print(versionID);
+			writer.close();
+		} catch (IOException e)
+		{
+			throw new GeneralException("Failed to write version file. " + e.getMessage(), e);
 		}
 		
 		return null;
