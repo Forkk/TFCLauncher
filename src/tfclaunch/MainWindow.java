@@ -121,7 +121,7 @@ public class MainWindow
 		newsScrollPane = new JScrollPane();
 		GridBagConstraints gbc_newsScrollPane = new GridBagConstraints();
 		gbc_newsScrollPane.gridwidth = 2;
-		gbc_newsScrollPane.insets = new Insets(0, 0, 5, 5);
+		gbc_newsScrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_newsScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_newsScrollPane.gridx = 0;
 		gbc_newsScrollPane.gridy = 0;
