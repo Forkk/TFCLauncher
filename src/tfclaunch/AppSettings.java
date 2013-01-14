@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import tfclaunch.utils.AppUtils;
 import tfclaunch.utils.GeneralException;
+import tfclaunch.utils.PathUtils;
 
 public class AppSettings extends Properties
 {
@@ -62,7 +64,7 @@ public class AppSettings extends Properties
 	
 	public File getInstallPath()
 	{
-		return new File(getProperty("installDir", "tfcraft"));
+		return new File(getProperty("installDir", PathUtils.combine(AppUtils.getAppDataDir(), "minecraft")));
 	}
 	
 	public void setInstallPath(File path)

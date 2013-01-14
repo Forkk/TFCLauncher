@@ -35,6 +35,7 @@ import javax.swing.event.HyperlinkListener;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
+import tfclaunch.utils.AppUtils;
 import tfclaunch.utils.GeneralException;
 
 public class MainWindow
@@ -277,7 +278,7 @@ public class MainWindow
 			newsPane.setText("<html><head></head><body><p style=\"color:red; text-align:center;\">Failed to load news.</p></body></html>");
 		}
 		
-		settings = new AppSettings(new File("tfclauncher.cfg"));
+		settings = new AppSettings(new File(AppUtils.getAppDataDir(), "tfclauncher.cfg"));
 		try
 		{
 			settings.loadSettings();
@@ -289,7 +290,7 @@ public class MainWindow
 		
 		UserInfo uinfo = new UserInfo("", "");
 		
-		uinfo.readFile(new File("lastlogin"));
+		uinfo.readFile(new File(AppUtils.getAppDataDir(), "lastlogin"));
 		
 		usernameField.setText(uinfo.getUsername());
 		passwordField.setText(uinfo.getPassword());
@@ -354,7 +355,7 @@ public class MainWindow
 		UserInfo uinfo = new UserInfo(usernameField.getText(), new String(passwordField.getPassword()));
 		try
 		{
-			uinfo.writeFile(new File("lastlogin"), chckbxRememberPassword.isSelected());
+			uinfo.writeFile(new File(AppUtils.getAppDataDir(), "lastlogin"), chckbxRememberPassword.isSelected());
 		} catch (IOException e1)
 		{
 			e1.printStackTrace();
