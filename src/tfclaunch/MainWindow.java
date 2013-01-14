@@ -266,13 +266,11 @@ public class MainWindow
 		gbc_btnLogin.gridx = 2;
 		gbc_btnLogin.gridy = 2;
 		loginPanel.add(btnLogin, gbc_btnLogin);
-		loginPanel.setFocusTraversalPolicy(new FocusTraversalOnArray(
-				new Component[] { usernameField, passwordField,
-						chckbxRememberPassword, btnLogin, btnOptions }));
 		
 		try
 		{
 			newsPane.setPage("http://terrafirmacraft.com");
+			frmTerrafirmacraftLauncher.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{usernameField, passwordField, chckbxRememberPassword, btnLogin}));
 		} catch (IOException e)
 		{
 			e.printStackTrace();
