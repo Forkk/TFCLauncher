@@ -3,10 +3,12 @@ package tfclaunch;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -45,6 +47,7 @@ public class GameLauncher
 			File loadOrderFile = new File(binDir, "loadorder.txt");
 			FileInputStream stream = new FileInputStream(loadOrderFile);
 			Scanner scanner = new Scanner(stream);
+			scanner.useDelimiter(System.getProperty("line.separator"));
 			while (scanner.hasNext())
 			{
 				File jarFile = new File(jarModsDir, scanner.next());
