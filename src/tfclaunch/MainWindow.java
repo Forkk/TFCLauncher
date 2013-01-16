@@ -28,12 +28,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ProgressMonitor;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import tfclaunch.utils.AppUtils;
 import tfclaunch.utils.GeneralException;
@@ -268,15 +274,7 @@ public class MainWindow
 		gbc_btnLogin.gridy = 2;
 		loginPanel.add(btnLogin, gbc_btnLogin);
 		
-		try
-		{
-			newsPane.setPage("http://terrafirmacraft.com");
-			frmTerrafirmacraftLauncher.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{usernameField, passwordField, chckbxRememberPassword, btnLogin}));
-		} catch (IOException e)
-		{
-			e.printStackTrace();
-			newsPane.setText("<html><head></head><body><p style=\"color:red; text-align:center;\">Failed to load news.</p></body></html>");
-		}
+		frmTerrafirmacraftLauncher.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{usernameField, passwordField, chckbxRememberPassword, btnLogin}));
 		
 		settings = new AppSettings(new File(AppUtils.getAppDataDir(), "tfclauncher.cfg"));
 		try
@@ -294,6 +292,8 @@ public class MainWindow
 		
 		usernameField.setText(uinfo.getUsername());
 		passwordField.setText(uinfo.getPassword());
+		
+		loadNewsPage();
 	}
 	
 	/**
@@ -348,6 +348,53 @@ public class MainWindow
 		for (int i = 0; i < components.length; i++)
 			if (components[i] != lblLoginStatus)
 				components[i].setEnabled(enable);
+	}
+	
+	private void loadNewsPage()
+	{
+		try
+		{
+			// Yes, let's create a document builder factory, an object used to create a document builder.
+			// What does this document builder do? It creates Documents, of course! 
+			// An object to create an object to create an object. Gotta love dat Java!
+			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse("http://terrafirmacraft.com/feed/");
+			
+			String newsHTML = NewsPageGenerator.generateNewsPage(doc);
+			newsPane.setText(newsHTML);
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					newsScrollPane.getVerticalScrollBar().setValue(0);
+				}
+			});
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+			newsPane.setText("<html><head></head><body>" +
+					"<p style=\"color:red; text-align:center;\">Failed to load news.</p>" +
+					"<p style=\"color:red; text-align:center;\">IOException: " + e.getMessage() + "</p>" +
+					"</body></html>");
+			return;
+		} catch (ParserConfigurationException e)
+		{
+			e.printStackTrace();
+			newsPane.setText("<html><head></head><body>" +
+					"<p style=\"color:red; text-align:center;\">Failed to load news.</p>" +
+					"<p style=\"color:red; text-align:center;\">ParserConfigurationException: " + e.getMessage() + "</p>" +
+					"</body></html>");
+			return;
+		} catch (SAXException e)
+		{
+			e.printStackTrace();
+			newsPane.setText("<html><head></head><body>" +
+					"<p style=\"color:red; text-align:center;\">Failed to load news.</p>" +
+					"<p style=\"color:red; text-align:center;\">SAXException: " + e.getMessage() + "</p>" +
+					"</body></html>");
+			return;
+		}
 	}
 	
 	private void onLoginClicked()
