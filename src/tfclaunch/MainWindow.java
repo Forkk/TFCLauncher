@@ -5,6 +5,9 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -14,6 +17,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
@@ -60,6 +64,9 @@ public class MainWindow
 	private JLabel lblLoginStatus;
 	
 	private AppSettings settings;
+	
+	private Font newsFont;
+	private Font newsFontBold;
 	
 	/**
 	 * Launch the application.
@@ -293,6 +300,7 @@ public class MainWindow
 		usernameField.setText(uinfo.getUsername());
 		passwordField.setText(uinfo.getPassword());
 		
+		loadNewsPageFonts();
 		loadNewsPage();
 	}
 	
@@ -363,6 +371,9 @@ public class MainWindow
 			
 			String newsHTML = NewsPageGenerator.generateNewsPage(doc);
 			newsPane.setText(newsHTML);
+			
+//			Style fontStyle = newsPane.getStyledDocument().addStyle(null, null);
+//			fontStyle.addAttribute("font-face", value);
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
@@ -394,6 +405,33 @@ public class MainWindow
 					"<p style=\"color:red; text-align:center;\">SAXException: " + e.getMessage() + "</p>" +
 					"</body></html>");
 			return;
+		}
+	}
+	
+	private void loadNewsPageFonts()
+	{
+		try
+		{
+			// Load and register fonts.
+			{
+				InputStream in = MainWindow.class.getResourceAsStream("/tfclaunch/fonts/ptsans_regular.ttf");
+				newsFont = Font.createFont(Font.TRUETYPE_FONT, in);
+				GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(newsFont);
+			}
+			
+			{
+				InputStream in = MainWindow.class.getResourceAsStream("/tfclaunch/fonts/ptsans_bold.ttf");
+				newsFontBold = Font.createFont(Font.TRUETYPE_FONT, in);
+				GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(newsFontBold);
+			}
+		} catch (FontFormatException e)
+		{
+			// TODO: Display error message.
+			e.printStackTrace();
+		} catch (IOException e)
+		{
+			// TODO: Display error message.
+			e.printStackTrace();
 		}
 	}
 	
