@@ -37,7 +37,7 @@ import tfclaunch.utils.PathUtils;
  */
 public class GameUpdater extends SwingWorker<Void, Void>
 {
-	public static final String updateCheckURL = "http://localhost/tfcfiles.json";
+	public static final String updateCheckURL = "http://terrafirmacraft.com/files/tfcfiles.json";
 	
 	public GameUpdater(File installDir, boolean forceUpdate)
 	{
