@@ -417,13 +417,13 @@ public class MainWindow
 		{
 			// Load and register fonts.
 			{
-				InputStream in = MainWindow.class.getResourceAsStream("/tfclaunch/fonts/ptsans_regular.ttf");
+				InputStream in = MainWindow.class.getResourceAsStream("/net/tfcl/fonts/ptsans_regular.ttf");
 				newsFont = Font.createFont(Font.TRUETYPE_FONT, in);
 				GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(newsFont);
 			}
 			
 			{
-				InputStream in = MainWindow.class.getResourceAsStream("/tfclaunch/fonts/ptsans_bold.ttf");
+				InputStream in = MainWindow.class.getResourceAsStream("/net/tfcl/fonts/ptsans_bold.ttf");
 				newsFontBold = Font.createFont(Font.TRUETYPE_FONT, in);
 				GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(newsFontBold);
 			}
