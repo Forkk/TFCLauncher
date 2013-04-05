@@ -300,6 +300,8 @@ public class MainWindow
 		
 		usernameField.setText(uinfo.getUsername());
 		passwordField.setText(uinfo.getPassword());
+		if(passwordField.getPassword().length > 0)
+			chckbxRememberPassword.setSelected(true);
 		
 		loadNewsPageFonts();
 		loadNewsPage();
