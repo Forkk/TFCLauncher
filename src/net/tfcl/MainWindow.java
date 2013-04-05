@@ -1,4 +1,4 @@
-package tfclaunch;
+package net.tfcl;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -41,12 +41,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.tfcl.utils.AppUtils;
+import net.tfcl.utils.GeneralException;
+
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import tfclaunch.utils.AppUtils;
-import tfclaunch.utils.GeneralException;
 
 public class MainWindow
 {

@@ -1,9 +1,10 @@
-package tfclaunch;
+package net.tfcl;
+
+import net.tfcl.rss.RSSFeed;
+import net.tfcl.rss.RSSItem;
 
 import org.w3c.dom.Document;
 
-import tfclaunch.rss.RSSFeed;
-import tfclaunch.rss.RSSItem;
 
 
 /**

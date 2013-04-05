@@ -1,4 +1,4 @@
-package tfclaunch.utils;
+package net.tfcl.utils;
 
 public class PathUtils
 {

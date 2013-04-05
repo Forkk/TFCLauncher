@@ -1,4 +1,4 @@
-package tfclaunch;
+package net.tfcl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,9 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import tfclaunch.utils.AppUtils;
-import tfclaunch.utils.GeneralException;
-import tfclaunch.utils.PathUtils;
+import net.tfcl.utils.AppUtils;
+import net.tfcl.utils.GeneralException;
+import net.tfcl.utils.PathUtils;
+
 
 public class AppSettings extends Properties
 {

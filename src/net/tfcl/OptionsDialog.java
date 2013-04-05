@@ -1,4 +1,4 @@
-package tfclaunch;
+package net.tfcl;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -18,7 +18,8 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 
-import tfclaunch.utils.GeneralException;
+import net.tfcl.utils.GeneralException;
+
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

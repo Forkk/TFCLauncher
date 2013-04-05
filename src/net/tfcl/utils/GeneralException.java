@@ -1,4 +1,4 @@
-package tfclaunch.utils;
+package net.tfcl.utils;
 
 /**
  * An exception thrown by back-end code when it encounters an error. Should be handled

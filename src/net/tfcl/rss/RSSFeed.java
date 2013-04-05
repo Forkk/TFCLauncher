@@ -1,4 +1,4 @@
-package tfclaunch.rss;
+package net.tfcl.rss;
 
 import java.util.ArrayList;
 import java.util.List;

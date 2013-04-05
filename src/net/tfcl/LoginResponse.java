@@ -1,4 +1,4 @@
-package tfclaunch;
+package net.tfcl;
 
 /**
  * Class representing a response from the login servers.

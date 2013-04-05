@@ -1,4 +1,4 @@
-package tfclaunch;
+package net.tfcl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +10,8 @@ import java.util.Scanner;
 
 import javax.swing.SwingWorker;
 
-import tfclaunch.utils.GeneralException;
+import net.tfcl.utils.GeneralException;
+
 
 public class LoginWorker extends SwingWorker<LoginResponse, Void>
 {

@@ -1,4 +1,4 @@
-package tfclaunch;
+package net.tfcl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +12,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import tfclaunch.utils.GeneralException;
+import net.tfcl.utils.GeneralException;
+
 
 /**
  * Launches the game.

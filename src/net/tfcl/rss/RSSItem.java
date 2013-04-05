@@ -1,4 +1,4 @@
-package tfclaunch.rss;
+package net.tfcl.rss;
 
 import org.w3c.dom.Element;
 

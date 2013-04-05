@@ -1,4 +1,4 @@
-package tfclaunch;
+package net.tfcl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,13 +22,14 @@ import java.util.zip.ZipOutputStream;
 
 import javax.swing.SwingWorker;
 
+import net.tfcl.utils.GeneralException;
+import net.tfcl.utils.OSUtils;
+import net.tfcl.utils.PathUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import tfclaunch.utils.GeneralException;
-import tfclaunch.utils.OSUtils;
-import tfclaunch.utils.PathUtils;
 
 /**
  * Worker that downloads and installs the game.

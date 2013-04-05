@@ -1,4 +1,4 @@
-package tfclaunch;
+package net.tfcl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
