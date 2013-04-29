@@ -74,6 +74,28 @@ public class AppSettings extends Properties
 	}
 	
 	
+	public int getMinMemAlloc()
+	{
+		return Integer.parseInt(getProperty("minMemAlloc", "512"));
+	}
+	
+	public void setMinMemAlloc(int value)
+	{
+		setProperty("minMemAlloc", new Integer(value).toString());
+	}
+	
+	
+	public int getMaxMemAlloc()
+	{
+		return Integer.parseInt(getProperty("maxMemAlloc", "1024"));
+	}
+	
+	public void setMaxMemAlloc(int value)
+	{
+		setProperty("maxMemAlloc", new Integer(value).toString());
+	}
+	
+	
 	private File settingsFile;
 	
 	private boolean forceUpdate;

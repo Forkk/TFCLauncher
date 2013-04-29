@@ -3,14 +3,14 @@ package net.tfcl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import javax.swing.JOptionPane;
 
 import net.tfcl.utils.GeneralException;
 
@@ -22,6 +22,38 @@ import net.tfcl.utils.GeneralException;
  */
 public class GameLauncher
 {
+	/**
+	 * Main function for the game launcher. This starts Minecraft. (in case you couldn't guess from the class name)
+	 * @param args Command line arguments passed to the launcher.
+	 *     The first argument is the user's username.
+	 *     The second argument is the session ID.
+	 *     The third argument is the directory 
+	 */
+	public static void main(String[] args)
+	{
+		if (args.length <3) // I wub you /)^3^(\
+		{
+			System.out.println("Invalid arguments.");
+			System.exit(1);
+		}
+		
+		LoginResponse sessionInfo = new LoginResponse(args[0], args[1]);
+		String installDir = args[2];
+		
+		GameLauncher launcher = new GameLauncher(installDir, sessionInfo);
+		try
+		{
+			launcher.launch();
+		} catch (GeneralException e)
+		{
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage(),
+					"Launch Failed", JOptionPane.ERROR_MESSAGE);
+			
+			System.exit(-1);
+		}
+	}
+	
 	public GameLauncher(String installDir, LoginResponse sessionInfo)
 	{
 		this.installDir = installDir;

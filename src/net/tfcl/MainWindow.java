@@ -18,7 +18,9 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
@@ -43,6 +45,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.tfcl.utils.AppUtils;
 import net.tfcl.utils.GeneralException;
+import net.tfcl.utils.StreamListener;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.w3c.dom.Document;
@@ -68,6 +71,10 @@ public class MainWindow
 	
 	private Font newsFont;
 	private Font newsFontBold;
+	
+	
+	private Process mcProcess;
+	private StreamListener stdOutListener;
 	
 	/**
 	 * Launch the application.
@@ -568,21 +575,43 @@ public class MainWindow
 	
 	private void launchGame(String installDir, LoginResponse sessionInfo)
 	{
-		// Start the game.
-		GameLauncher launcher = new GameLauncher(installDir, sessionInfo);
-		boolean launched = true;
+		// java -jar <jarfile> <class>
+		String jarPath;
 		try
 		{
-			launcher.launch();
-		} catch (GeneralException e)
+			jarPath = URLDecoder.decode(MainWindow.class.getProtectionDomain().
+					getCodeSource().getLocation().getPath(), "UTF-8");
+		} catch (UnsupportedEncodingException e)
 		{
 			e.printStackTrace();
-			launched = false;
-			JOptionPane.showMessageDialog(frmTerrafirmacraftLauncher, e.getMessage(),
-					"Launch Failed", JOptionPane.ERROR_MESSAGE);
+			// Some stupid shit occurred.
+			throw new RuntimeException(e);
 		}
-		if (launched)
+		
+		String maxMemArg = "-Xmx" + settings.getMaxMemAlloc() + "M";
+		String minMemArg = "-Xms" + settings.getMinMemAlloc() + "M";
+		
+		ProcessBuilder procBuilder = new ProcessBuilder("java", 
+				maxMemArg, minMemArg, "-cp", jarPath, "net.tfcl.GameLauncher",
+				sessionInfo.getUsername(), sessionInfo.getSessionID(), installDir);
+		procBuilder.redirectErrorStream(true);
+		try
+		{
+			mcProcess = procBuilder.start();
+			
+			// TODO: Console logs and stuff.
+			stdOutListener = new StreamListener(mcProcess.getInputStream());
+			stdOutListener.start();
+			
 			frmTerrafirmacraftLauncher.setVisible(false);
+			System.exit(mcProcess.waitFor());
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		} catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	private void onOptionsClicked()
