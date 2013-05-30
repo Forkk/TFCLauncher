@@ -38,7 +38,7 @@ import org.json.JSONObject;
  */
 public class GameUpdater extends SwingWorker<Void, Void>
 {
-	public static final String updateCheckURL = "http://terrafirmacraft.com/files/tfcfiles1.json";
+	public static final String updateCheckURL = "http://199.71.214.78/files/tfcfiles1.json";
 
 	public GameUpdater(File installDir, boolean forceUpdate)
 	{
@@ -133,16 +133,22 @@ public class GameUpdater extends SwingWorker<Void, Void>
 		setProgress(20);
 		File loadOrder = new File(binDir, "loadorder.txt");
 		PrintWriter writer = null;
+		if(forceUpdate || !versionID.equalsIgnoreCase(installedVersion))
+		{
+			writer = new PrintWriter(loadOrder);
+			writer.println(urlFilename(forgeURL.get(0)));
+			writer.println(urlFilename(papiURL.get(0)));
+		}
+
 		if (forceUpdate || !forgeVersion.equalsIgnoreCase(forgeVersionInstalled))
 		{
 			//Download Forge
 			{
 				deleteFileName(new File(installDir, "mods"), "minecraftforge-universal");
 				setStatus("Downloading Forge: "+forgeVersion);
-				if(writer == null)
-					writer = new PrintWriter(loadOrder);
-				downloadFileList(forgeURL, new File(binDir, "jarmods"),
-						writer, statusPrefix);
+				/*if(writer == null)
+					writer = new PrintWriter(loadOrder);*/
+				downloadFileList(forgeURL, new File(binDir, "jarmods"), statusPrefix);
 			}
 		}
 		setProgress(40);
@@ -152,10 +158,9 @@ public class GameUpdater extends SwingWorker<Void, Void>
 			{
 				deleteFileName(new File(installDir, "mods"), "Player API");
 				setStatus("Downloading PlayerAPI: "+papiVersion);
-				if(writer == null)
-					writer = new PrintWriter(loadOrder);
-				downloadFileList(papiURL, new File(binDir, "jarmods"),
-						writer, statusPrefix);
+				/*if(writer == null)
+					writer = new PrintWriter(loadOrder);*/
+				downloadFileList(papiURL, new File(binDir, "jarmods"), statusPrefix);
 			}
 		}
 		setProgress(50);
@@ -354,9 +359,8 @@ public class GameUpdater extends SwingWorker<Void, Void>
 	 * @throws IOException if an IOException is thrown
 	 * @throws GeneralException If a problem occurs. Should be handled by displaying an error message to the user.
 	 */
-	private void downloadFileList(ArrayList<URL> urls, File dest, PrintWriter writer, String statusPrefix) 
-			throws IOException, GeneralException
-			{
+	private void downloadFileList(ArrayList<URL> urls, File dest, PrintWriter writer, String statusPrefix) throws IOException, GeneralException
+	{
 		if (!dest.exists())
 			dest.mkdirs();
 
@@ -373,7 +377,7 @@ public class GameUpdater extends SwingWorker<Void, Void>
 				writer.println(urlFilename(urls.get(i)));
 			}
 		}
-			}
+	}
 
 	private void downloadLWJGL() throws IOException, GeneralException
 	{
