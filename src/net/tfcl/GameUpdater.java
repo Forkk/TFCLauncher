@@ -38,7 +38,7 @@ import org.json.JSONObject;
  */
 public class GameUpdater extends SwingWorker<Void, Void>
 {
-	public static final String updateCheckURL = "http://199.71.214.78/files/tfcfiles1.json";
+	public static final String updateCheckURL = "http://www.terrafirmacraft.com/files/tfcfiles1.json";
 
 	public GameUpdater(File installDir, boolean forceUpdate)
 	{

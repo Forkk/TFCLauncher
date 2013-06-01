@@ -376,7 +376,7 @@ public class MainWindow
 			// An object to create an object to create an object. Gotta love dat Java!
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-			Document doc = docBuilder.parse("http://wiki.terrafirmacraft.com/feed/");
+			Document doc = docBuilder.parse("http://www.terrafirmacraft.com/feed/");
 			
 			String newsHTML = NewsPageGenerator.generateNewsPage(doc);
 			newsPane.setText(newsHTML);
